@@ -177,3 +177,86 @@ eventForm.addEventListener('submit', async event => {
 });
 
 window.setTimeout(() => splashScreen.classList.add('is-hidden'), 1150);
+
+let cameraStream;
+let cameraAnimation;
+
+function setupCameraScanner() {
+  const frame = document.querySelector('.camera-frame');
+  const actions = document.querySelector('.scanner-actions');
+  if (!frame || document.getElementById('cameraButton')) return;
+  const video = document.createElement('video');
+  video.id = 'cameraVideo';
+  video.setAttribute('playsinline', 'true');
+  video.setAttribute('aria-label', 'Vista previa de la cámara');
+  const button = document.createElement('button');
+  button.className = 'secondary-button camera-button';
+  button.id = 'cameraButton';
+  button.textContent = 'Activar cámara';
+  const status = document.createElement('p');
+  status.className = 'camera-status';
+  status.id = 'cameraStatus';
+  frame.appendChild(video);
+  actions.prepend(button);
+  actions.after(status);
+  button.addEventListener('click', toggleCamera);
+}
+
+async function toggleCamera() {
+  const button = document.getElementById('cameraButton');
+  const video = document.getElementById('cameraVideo');
+  const frame = document.querySelector('.camera-frame');
+  const status = document.getElementById('cameraStatus');
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+    cancelAnimationFrame(cameraAnimation);
+    frame.classList.remove('camera-active');
+    button.classList.remove('active');
+    button.textContent = 'Activar cámara';
+    status.textContent = 'Cámara detenida';
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia) {
+    status.textContent = 'Este navegador no permite acceso a cámara.';
+    status.className = 'camera-status error';
+    return;
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    video.srcObject = cameraStream;
+    await video.play();
+    frame.classList.add('camera-active');
+    button.classList.add('active');
+    button.textContent = 'Detener cámara';
+    status.className = 'camera-status';
+    status.textContent = 'Cámara activa · buscando un QR…';
+    scanCameraFrame();
+  } catch (error) {
+    status.className = 'camera-status error';
+    status.textContent = error.name === 'NotAllowedError' ? 'Permiso de cámara denegado. Habilitalo en el navegador.' : 'No se pudo iniciar la cámara.';
+  }
+}
+
+async function scanCameraFrame() {
+  if (!cameraStream) return;
+  const video = document.getElementById('cameraVideo');
+  const status = document.getElementById('cameraStatus');
+  if ('BarcodeDetector' in window) {
+    try {
+      const detector = new BarcodeDetector({ formats: ['qr_code'] });
+      const codes = await detector.detect(video);
+      if (codes.length) {
+        status.className = 'camera-status success';
+        status.textContent = 'QR detectado · validando acceso…';
+        setScanState('valid');
+        return;
+      }
+    } catch { /* El navegador puede no tener el formato QR habilitado. */ }
+  } else {
+    status.textContent = 'Cámara activa · validación QR disponible en Chrome/Android.';
+  }
+  cameraAnimation = requestAnimationFrame(scanCameraFrame);
+}
+
+setupCameraScanner();

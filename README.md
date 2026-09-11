@@ -22,6 +22,7 @@ Este repositorio contiene un prototipo navegable de alta fidelidad y un backend 
 - Asistente de creación de eventos con nombre, fecha, horario, ubicación, ciudad, capacidad y tipos de entrada.
 - Dashboard del organizador con aforo, flujo horario, capacidad, puertas y actividad reciente.
 - Escáner de acreditación con tres estados: válido, QR usado e inválido.
+- Activación de cámara trasera del dispositivo y detección QR mediante `BarcodeDetector` cuando el navegador lo soporta.
 - Ticket digital con identidad, tipo de acceso, fecha, puertas y QR visual.
 - Gestión de listas con categorías General, VIP y Prensa.
 - Diseño responsive para desktop, tablet y móvil.
@@ -362,6 +363,7 @@ La aplicación debe diferenciar “válido offline con sincronización pendiente
 ├── auth.css         # Splash inicial y acceso por roles
 ├── role-overrides.css # Permisos visuales del menú por rol
 ├── auth-overrides.css # Formulario de login
+├── camera.css        # Estados visuales del visor de cámara
 ├── app.js           # Navegación, simulaciones y creación de evento demo
 ├── server.js         # API local, sesiones y autorización por rol
 ├── .gitignore       # Excluye datos locales y secretos
