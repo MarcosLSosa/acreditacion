@@ -15,7 +15,7 @@ function hashPassword(password, salt = 'acredita-local-salt') {
   return crypto.scryptSync(password, salt, 32).toString('hex');
 }
 
-alosfunction createInitialStore() {
+function createInitialStore() {
   return {
     users: [
       { id: 'usr-admin', name: 'Lucía M.', email: process.env.ADMIN_EMAIL || 'admin@acredita.local', role: 'admin', passwordHash: hashPassword(process.env.ADMIN_PASSWORD || 'admin-demo-2026') },
