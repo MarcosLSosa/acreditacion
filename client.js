@@ -33,7 +33,10 @@ function escapeHtml(value) {
 function renderGuests() {
   const table = document.querySelector('.guest-table');
   if (!table) return;
-  table.innerHTML = '<div class="table-head"><span>ASISTENTE</span><span>TIPO DE ACCESO</span><span>ESTADO</span><span>ÚLTIMO INGRESO</span><span></span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><span class="activity-avatar ${guest.color}">${escapeHtml(guest.initials)}</span><strong>${escapeHtml(guest.name)}<small>ID ${escapeHtml(guest.id)}</small></strong></span><span>${escapeHtml(guest.category)}</span><span class="${guest.status === 'Ingresó' ? 'valid-tag' : 'pending-tag'}">${escapeHtml(guest.status)}</span><span>${escapeHtml(guest.gate)}</span><button class="more-button" aria-label="Opciones de ${escapeHtml(guest.name)}">•••</button></div>`).join('');
+  const query = (document.getElementById('guestSearch')?.value || '').toLowerCase().trim();
+  const filter = document.querySelector('.filter.active')?.dataset.filter || 'all';
+  const visibleGuests = guests.filter(guest => (filter === 'all' || guest.category === filter || guest.status === filter) && (!query || `${guest.name} ${guest.id} ${guest.email}`.toLowerCase().includes(query)));
+  table.innerHTML = '<div class="table-head"><span>ASISTENTE</span><span>TIPO DE ACCESO</span><span>ESTADO</span><span>ÚLTIMO INGRESO</span><span>ACCIONES</span></div>' + (visibleGuests.length ? visibleGuests.map(guest => `<div class="table-row"><span class="guest-cell"><span class="activity-avatar ${guest.color}">${escapeHtml(guest.initials)}</span><strong>${escapeHtml(guest.name)}<small>ID ${escapeHtml(guest.id)}</small></strong></span><span class="guest-category">${escapeHtml(guest.category)}</span><span class="${guest.status === 'Ingresó' ? 'valid-tag' : 'pending-tag'}">${escapeHtml(guest.status)}</span><span class="guest-gate">${escapeHtml(guest.gate)}</span><button class="more-button" aria-label="Opciones de ${escapeHtml(guest.name)}">•••</button></div>`).join('') : '<div class="empty-guests">No hay invitados que coincidan con la búsqueda.</div>');
 }
 
 function openGuestModal() {
@@ -86,16 +89,12 @@ document.getElementById('copyGuestLink').addEventListener('click', async () => {
 });
 renderGuests();
 
-const guestImportButton = document.createElement('button');
-guestImportButton.className = 'secondary-button guest-import-button';
-guestImportButton.type = 'button';
-guestImportButton.innerHTML = '↑ Importar Excel';
-guestImportButton.title = 'Importar invitados desde Excel o CSV';
+const guestImportButton = document.getElementById('importGuestsTop');
 const guestFileInput = document.createElement('input');
 guestFileInput.type = 'file';
 guestFileInput.accept = '.xlsx,.xls,.csv,.tsv';
 guestFileInput.hidden = true;
-document.getElementById('addGuest').parentElement.append(guestImportButton, guestFileInput);
+document.body.appendChild(guestFileInput);
 
 function normalizeGuestKey(value) {
   return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '');
@@ -150,7 +149,7 @@ const templateButton = document.createElement('button');
 templateButton.className = 'template-link';
 templateButton.type = 'button';
 templateButton.textContent = 'Descargar plantilla';
-guestFileInput.after(templateButton);
+guestImportButton.after(templateButton);
 templateButton.addEventListener('click', () => {
   const content = 'Nombre,Email,Categoria,Puerta\nSofia Martinez,sofia@email.com,General,Todas\nMarina Castro,marina@email.com,VIP,Puerta 02\n';
   const link = document.createElement('a');
@@ -159,6 +158,12 @@ templateButton.addEventListener('click', () => {
   link.click();
   URL.revokeObjectURL(link.href);
 });
+
+document.getElementById('guestSearch').addEventListener('input', renderGuests);
+document.querySelectorAll('.filter[data-filter]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('.filter[data-filter]').forEach(filterButton => filterButton.classList.toggle('active', filterButton === button));
+  renderGuests();
+}));
 
 const budgetBot = document.getElementById('budgetBot');
 const budgetOptions = document.getElementById('budgetOptions');
