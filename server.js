@@ -89,9 +89,15 @@ function serveStatic(request, response, url) {
   fs.createReadStream(filePath).pipe(response);
 }
 
-const server = http.createServer(async (request, response) => {
+const requestHandler = async (request, response) => {
   const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
   if (url.pathname.startsWith('/api/')) return handleApi(request, response, url);
   return serveStatic(request, response, url);
-});
-server.listen(PORT, () => console.log(`Acredita disponible en http://localhost:${PORT}`));
+};
+
+if (require.main === module) {
+  const server = http.createServer(requestHandler);
+  server.listen(PORT, () => console.log(`Acredita disponible en http://localhost:${PORT}`));
+}
+
+module.exports = requestHandler;
