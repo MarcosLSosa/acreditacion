@@ -59,3 +59,55 @@ setInterval(() => {
   const next = Number(count.textContent.replace('.', '')) + 1;
   count.textContent = next.toLocaleString('es-AR');
 }, 18000);
+
+const landingPage = document.getElementById('landingPage');
+const appShell = document.querySelector('.app-shell');
+const createEventModal = document.getElementById('createEventModal');
+const eventForm = document.getElementById('eventForm');
+
+function openEventWizard() {
+  createEventModal.classList.add('open');
+  createEventModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeEventWizard() {
+  createEventModal.classList.remove('open');
+  createEventModal.setAttribute('aria-hidden', 'true');
+}
+
+function enterWorkspace(viewId = 'dashboard') {
+  landingPage.classList.add('landing-hidden');
+  appShell.classList.remove('app-hidden');
+  showView(viewId);
+}
+
+document.getElementById('startEvent').addEventListener('click', openEventWizard);
+document.getElementById('openLogin').addEventListener('click', () => enterWorkspace());
+document.getElementById('seeDemo').addEventListener('click', () => document.getElementById('operacion').scrollIntoView({ behavior: 'smooth' }));
+document.querySelectorAll('[data-close-modal]').forEach(control => control.addEventListener('click', closeEventWizard));
+document.querySelectorAll('[data-role]').forEach(roleButton => roleButton.addEventListener('click', () => {
+  const role = roleButton.dataset.role;
+  if (role === 'organizer') openEventWizard();
+  if (role === 'staff') enterWorkspace('scanner');
+  if (role === 'guest') enterWorkspace('ticket');
+}));
+
+document.getElementById('addTicketType').addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'ticket-type-row';
+  row.innerHTML = '<input placeholder="Nombre" aria-label="Nombre tipo de entrada"><input type="number" placeholder="Cupo" aria-label="Cupo tipo de entrada"><span>cupos</span>';
+  document.getElementById('ticketTypeList').appendChild(row);
+});
+
+eventForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const data = new FormData(eventForm);
+  const eventName = data.get('eventName') || 'Nuevo evento';
+  const venue = data.get('eventVenue') || 'Ubicación pendiente';
+  document.querySelector('.event-switcher strong').textContent = eventName;
+  document.querySelector('.event-switcher .muted').textContent = venue;
+  document.querySelector('#dashboard .page-heading h1').textContent = `Buenas tardes, ${eventName}`;
+  closeEventWizard();
+  enterWorkspace('dashboard');
+  notify(`Evento “${eventName}” creado correctamente`);
+});
