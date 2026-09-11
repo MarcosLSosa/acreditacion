@@ -296,6 +296,10 @@ body {
 .guest-qr-panel strong { color: #eef8f3; font: 600 18px 'Space Grotesk'; }
 .guest-qr-panel small { color: #8fa59d; font-size: 10px; }
 .guest-qr-panel .secondary-button { margin-top: 8px; }
+.guest-import-button { margin-left: 8px; border: 1px solid #31584b; background: #12231f; color: #d9ebe2; }
+.guest-import-button:hover { border-color: var(--green); background: #1c3a2f; }
+.template-link { display: block; margin-top: 9px; color: #8fa59d; background: transparent; font-size: 10px; text-decoration: underline; }
+.template-link:hover { color: var(--green); }
 
 @media (max-width: 980px) {
   .sidebar { width: 215px; }
@@ -322,6 +326,7 @@ body {
   .page-heading { align-items: flex-start; flex-direction: column; gap: 16px; }
   .page-heading h1 { font-size: clamp(28px, 9vw, 38px); }
   .page-heading .primary-button, .page-heading .secondary-button { width: 100%; }
+  .page-heading .guest-import-button { width: 100%; margin: 0; }
   .metric-grid { grid-template-columns: 1fr; }
   .metric-card { min-width: 0; }
   .dashboard-grid, .bottom-grid, .scanner-layout, .ticket-layout { gap: 16px; }

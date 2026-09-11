@@ -86,6 +86,80 @@ document.getElementById('copyGuestLink').addEventListener('click', async () => {
 });
 renderGuests();
 
+const guestImportButton = document.createElement('button');
+guestImportButton.className = 'secondary-button guest-import-button';
+guestImportButton.type = 'button';
+guestImportButton.innerHTML = '↑ Importar Excel';
+guestImportButton.title = 'Importar invitados desde Excel o CSV';
+const guestFileInput = document.createElement('input');
+guestFileInput.type = 'file';
+guestFileInput.accept = '.xlsx,.xls,.csv,.tsv';
+guestFileInput.hidden = true;
+document.getElementById('addGuest').parentElement.append(guestImportButton, guestFileInput);
+
+function normalizeGuestKey(value) {
+  return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '');
+}
+
+function guestFromRow(row, index) {
+  const fields = Object.fromEntries(Object.entries(row).map(([key, value]) => [normalizeGuestKey(key), String(value || '').trim()]));
+  const name = fields.nombre || fields.nombrecompleto || fields.name || fields.invitado;
+  if (!name) return null;
+  const email = fields.email || fields.correo || fields.correoelectronico || '';
+  const category = fields.categoria || fields.category || 'General';
+  const gate = fields.puerta || fields.gate || 'Todas';
+  const initials = name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+  const id = `AR-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${2300 + index}`;
+  return { name, email, category, gate, id, status: 'Pendiente', initials, color: 'green-bg' };
+}
+
+function importGuests(file) {
+  if (!window.XLSX) {
+    notify('No se pudo cargar el lector de Excel. Probá con CSV.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = event => {
+    try {
+      const workbook = window.XLSX.read(event.target.result, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = window.XLSX.utils.sheet_to_json(sheet, { defval: '' });
+      const imported = rows.map((row, index) => guestFromRow(row, index)).filter(Boolean);
+      if (!imported.length) {
+        notify('No encontramos filas válidas. Usá columnas Nombre, Email, Categoría y Puerta.');
+        return;
+      }
+      guests.unshift(...imported);
+      renderGuests();
+      notify(`${imported.length} invitado${imported.length === 1 ? '' : 's'} importado${imported.length === 1 ? '' : 's'} con QR listo`);
+    } catch {
+      notify('No pudimos leer el archivo. Revisá que sea Excel o CSV válido.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+guestImportButton.addEventListener('click', () => guestFileInput.click());
+guestFileInput.addEventListener('change', event => {
+  const [file] = event.target.files;
+  if (file) importGuests(file);
+  event.target.value = '';
+});
+
+const templateButton = document.createElement('button');
+templateButton.className = 'template-link';
+templateButton.type = 'button';
+templateButton.textContent = 'Descargar plantilla';
+guestFileInput.after(templateButton);
+templateButton.addEventListener('click', () => {
+  const content = 'Nombre,Email,Categoria,Puerta\nSofia Martinez,sofia@email.com,General,Todas\nMarina Castro,marina@email.com,VIP,Puerta 02\n';
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }));
+  link.download = 'plantilla-invitados.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+
 const budgetBot = document.getElementById('budgetBot');
 const budgetOptions = document.getElementById('budgetOptions');
 const budgetMessages = document.getElementById('budgetMessages');
