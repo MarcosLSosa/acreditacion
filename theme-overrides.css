@@ -1,0 +1,117 @@
+:root {
+  --ink: #eaf4ef;
+  --muted: #8ea29b;
+  --line: #263a36;
+  --paper: #0b1214;
+  --white: #121d20;
+  --green: #45e0a2;
+  --green-dark: #1bbf7b;
+  --blue: #79a8ff;
+  --orange: #ffad5c;
+  --red: #ff6874;
+  --shadow: 0 24px 70px rgba(0, 0, 0, .28);
+}
+
+body {
+  background: #0b1214;
+  color: var(--ink);
+}
+
+.landing-page {
+  position: relative;
+  isolation: isolate;
+  background: #0b1214;
+  color: var(--ink);
+}
+
+.landing-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .28;
+  background-image: linear-gradient(#1c302d 1px, transparent 1px), linear-gradient(90deg, #1c302d 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.landing-nav { border-bottom: 1px solid rgba(69, 224, 162, .12); }
+.landing-brand, .landing-login, .hero-secondary { color: var(--ink); }
+.landing-links a { color: #91a59e; }
+.landing-links a:hover, .landing-login span { color: var(--green); }
+.hero-kicker, .eyebrow.accent { color: var(--green); }
+.hero-copy h1 { color: #f0f8f4; }
+.hero-copy h1 em, .feature-intro h2 em, .wizard-side h2 em { color: var(--green); }
+.hero-copy > p, .feature-grid article p, .roles-section small, .landing-footer { color: #91a59e; }
+.hero-kicker-dot { box-shadow: 0 0 0 5px rgba(69, 224, 162, .1); }
+.hero-primary { background: var(--green); color: #071510; box-shadow: 0 12px 28px rgba(69, 224, 162, .16); }
+.hero-primary span, .play-icon, .feature-arrow { color: var(--green); }
+.play-icon { border-color: #31534a; }
+.hero-proof strong { color: #dfece7; }
+
+.hero-card, .floating-stat {
+  background: #132023;
+  border-color: #2d4841;
+  box-shadow: var(--shadow);
+}
+.ticket-preview { color: #e8f4ef; }
+.preview-event strong, .preview-id { color: #effaf5; }
+.preview-event small, .preview-qr span { color: #91a59e; }
+.preview-live, .preview-id b { color: var(--green); }
+.preview-qr { border-color: #31534a; background: #0d1719; }
+.preview-logo i { background: var(--green); color: #081610; }
+.float-icon { background: #173c31; color: var(--green); }
+.stat-top > b { color: var(--green); }
+.hero-orbit { border-color: rgba(69, 224, 162, .18); }
+.hero-seal { border-color: var(--green); color: var(--green); }
+
+.logo-strip, .landing-feature, .roles-section { border-color: rgba(69, 224, 162, .14); }
+.logo-strip { color: #8fa59d; }
+.logo-strip b { color: #dcebe4; }
+.feature-grid article { background: #111c1f; border-color: #263b37; }
+.feature-grid article:hover { border-color: var(--green); background: #152522; }
+.feature-number { color: var(--green); }
+.feature-grid h3, .roles-section h2 { color: #eef8f3; }
+.role-pills button { background: #111c1f; border-color: #263b37; color: #eef8f3; }
+.role-pills button:hover { border-color: var(--green); background: #152522; }
+.role-pills button > span { color: var(--green); }
+.role-pills b { color: var(--green); }
+.landing-footer { border-color: rgba(69, 224, 162, .14); }
+
+.sidebar { background: #080f11; border-right: 1px solid #1c302d; }
+.event-switcher, .nav-item:hover, .nav-item.active { background: #142321; border-color: #28453c; }
+.main-content { background: #0b1214; }
+.topbar { background: rgba(11, 18, 20, .92); border-bottom-color: #1f3330; }
+.page-heading h1, .panel-header h2, .metric-card strong, .ticket-card h2, .guests-view h2 { color: #eef8f3; }
+.page-heading p, .panel-header p, .metric-card span, .muted { color: #8ea29b; }
+.primary-button, .form-submit { background: var(--green); color: #071510; box-shadow: 0 10px 24px rgba(69, 224, 162, .12); }
+.metric-card, .panel, .ticket-card, .guest-table, .scanner-panel, .list-toolbar { background: #111c1f; border-color: #263b37; box-shadow: 0 16px 40px rgba(0, 0, 0, .16); }
+.metric-card:hover, .panel:hover { border-color: #356257; }
+.chart-area, .chart-grid, .guest-table thead { background-color: #0d1719; border-color: #203631; }
+.chart-line, .progress-fill, .status-dot, .pulse { background: var(--green); }
+.table-row, .guest-row, .activity-item { border-color: #263b37; }
+.status-badge.valid, .tag-green { background: #153c31; color: var(--green); }
+.tag-orange { background: #49301b; color: var(--orange); }
+.tag-red { background: #481f27; color: #ff8790; }
+
+.modal-backdrop { background: rgba(2, 7, 8, .78); backdrop-filter: blur(8px); }
+.auth-card, .event-wizard { background: #111c1f; border: 1px solid #2a4740; color: var(--ink); box-shadow: 0 30px 100px rgba(0, 0, 0, .5); }
+.auth-card p, .event-form p, .wizard-side p { color: #91a59e; }
+.auth-heading h2, .form-heading h2 { color: #eef8f3; }
+.auth-roles button, .ticket-type-row { background: #0d1719; border-color: #29463e; color: var(--ink); }
+.auth-roles button:hover { background: #153029; border-color: var(--green); }
+.auth-role-icon { background: #174536; color: var(--green); }
+.event-form label, .event-form input { color: #dcebe4; }
+.event-form input { background: #0b1517; border-color: #2b4941; }
+.event-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(69, 224, 162, .12); }
+.form-divider { border-color: #29443d; }
+.form-divider button { color: var(--green); }
+
+@media (max-width: 760px) {
+  .landing-nav { padding: 20px; }
+  .landing-links { display: none; }
+  .hero-section { padding: 58px 20px 64px; }
+  .hero-copy h1 { letter-spacing: -2px; }
+  .landing-feature, .roles-section { padding-left: 20px; padding-right: 20px; }
+}
