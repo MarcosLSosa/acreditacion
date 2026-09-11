@@ -15,24 +15,30 @@ function hashPassword(password, salt = 'acredita-local-salt') {
   return crypto.scryptSync(password, salt, 32).toString('hex');
 }
 
+alosfunction createInitialStore() {
+  return {
+    users: [
+      { id: 'usr-admin', name: 'Lucía M.', email: process.env.ADMIN_EMAIL || 'admin@acredita.local', role: 'admin', passwordHash: hashPassword(process.env.ADMIN_PASSWORD || 'admin-demo-2026') },
+      { id: 'usr-staff', name: 'Usuario de puerta', email: process.env.STAFF_EMAIL || 'puerta@acredita.local', role: 'staff', passwordHash: hashPassword(process.env.STAFF_PASSWORD || 'puerta-demo-2026') }
+    ],
+    events: []
+  };
+}
+
 function loadStore() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) {
-    const store = {
-      users: [
-        { id: 'usr-admin', name: 'Lucía M.', email: process.env.ADMIN_EMAIL || 'admin@acredita.local', role: 'admin', passwordHash: hashPassword(process.env.ADMIN_PASSWORD || 'admin-demo-2026') },
-        { id: 'usr-staff', name: 'Usuario de puerta', email: process.env.STAFF_EMAIL || 'puerta@acredita.local', role: 'staff', passwordHash: hashPassword(process.env.STAFF_PASSWORD || 'puerta-demo-2026') }
-      ],
-      events: []
-    };
+  if (fs.existsSync(DATA_FILE)) return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  const store = createInitialStore();
+  if (!process.env.VERCEL) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2));
-    return store;
   }
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  return store;
 }
 
 const store = loadStore();
-function saveStore() { fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2)); }
+function saveStore() {
+  if (!process.env.VERCEL) fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2));
+}
 function publicUser(user) { return { id: user.id, name: user.name, email: user.email, role: user.role }; }
 function parseCookies(request) { return Object.fromEntries((request.headers.cookie || '').split(';').filter(Boolean).map(value => { const [key, ...rest] = value.trim().split('='); return [key, decodeURIComponent(rest.join('='))]; })); }
 function getSessionUser(request) {
