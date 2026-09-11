@@ -104,6 +104,19 @@ body {
 .role-pills button:hover { transform: translateX(7px); }
 .role-pills button > span { color: var(--green); }
 .role-pills b { color: var(--green); }
+.roles-section { position: relative; overflow: hidden; background: #101c1e; border-top: 1px solid #263f38; border-bottom: 1px solid #263f38; }
+.roles-section::before { content: '02'; position: absolute; right: 4%; top: -28px; color: rgba(69, 224, 162, .08); font: 700 190px/.9 'Space Grotesk'; letter-spacing: -14px; pointer-events: none; }
+.roles-section > div { position: relative; z-index: 1; }
+.roles-section h2 { color: #f0f8f4; font-size: 42px; }
+.role-pills { position: relative; z-index: 1; gap: 12px; }
+.role-pills button { min-height: 168px; padding: 20px; border-radius: 5px; background: linear-gradient(145deg, #172724, #111c1f); box-shadow: 0 14px 28px rgba(0, 0, 0, .18); }
+.role-pills button:nth-child(2) { transform: translateY(14px); }
+.role-pills button:nth-child(2):hover { transform: translate(7px, 9px); }
+.role-pills button:nth-child(3) { transform: translateY(28px); }
+.role-pills button:nth-child(3):hover { transform: translate(7px, 23px); }
+.role-pills strong { color: #eef8f3; font-size: 14px; }
+.role-pills small { color: #8fa59d; }
+.role-pills button > span { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #3c8066; border-radius: 8px; background: #16392e; }
 .landing-footer { border-color: rgba(69, 224, 162, .14); }
 
 .preview-live, .live-pill { animation: live-pulse 2.4s ease-in-out infinite; }
@@ -271,6 +284,9 @@ body {
   .hero-section { padding: 58px 20px 64px; }
   .hero-copy h1 { letter-spacing: -2px; }
   .landing-feature, .roles-section { padding-left: 20px; padding-right: 20px; }
+  .roles-section h2 { font-size: 34px; }
+  .role-pills button:nth-child(2), .role-pills button:nth-child(3) { transform: none; }
+  .role-pills button:nth-child(2):hover, .role-pills button:nth-child(3):hover { transform: translateY(-4px); }
   .budget-trigger { right: 16px; bottom: 16px; }
   .budget-bot { right: 16px; bottom: 72px; }
 }
