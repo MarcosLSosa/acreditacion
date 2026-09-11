@@ -64,6 +64,9 @@ const landingPage = document.getElementById('landingPage');
 const appShell = document.querySelector('.app-shell');
 const createEventModal = document.getElementById('createEventModal');
 const eventForm = document.getElementById('eventForm');
+const authModal = document.getElementById('authModal');
+const splashScreen = document.getElementById('splashScreen');
+let activeRole = null;
 
 function openEventWizard() {
   createEventModal.classList.add('open');
@@ -75,20 +78,58 @@ function closeEventWizard() {
   createEventModal.setAttribute('aria-hidden', 'true');
 }
 
-function enterWorkspace(viewId = 'dashboard') {
+function openAuthModal() {
+  authModal.classList.add('open');
+  authModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAuthModal() {
+  authModal.classList.remove('open');
+  authModal.setAttribute('aria-hidden', 'true');
+}
+
+function applyRole(role) {
+  activeRole = role;
+  const isStaff = role === 'staff';
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const restricted = ['dashboard', 'ticket', 'guests'].includes(item.dataset.view);
+    item.hidden = isStaff && restricted;
+  });
+  document.querySelector('.profile strong').textContent = isStaff ? 'Usuario de puerta' : 'Lucía M.';
+  document.querySelector('.profile small').textContent = isStaff ? 'Staff · Puerta 01' : 'Administrador';
+  document.querySelector('.event-switcher .eyebrow').textContent = isStaff ? 'TURNO ASIGNADO' : 'EVENTO ACTIVO';
+}
+
+function enterWorkspace(viewId = 'dashboard', role = activeRole || 'admin') {
+  applyRole(role);
   landingPage.classList.add('landing-hidden');
   appShell.classList.remove('app-hidden');
   showView(viewId);
 }
 
-document.getElementById('startEvent').addEventListener('click', openEventWizard);
-document.getElementById('openLogin').addEventListener('click', () => enterWorkspace());
+document.getElementById('startEvent').addEventListener('click', openAuthModal);
+document.getElementById('openLogin').addEventListener('click', openAuthModal);
 document.getElementById('seeDemo').addEventListener('click', () => document.getElementById('operacion').scrollIntoView({ behavior: 'smooth' }));
 document.querySelectorAll('[data-close-modal]').forEach(control => control.addEventListener('click', closeEventWizard));
+document.querySelectorAll('[data-close-auth]').forEach(control => control.addEventListener('click', closeAuthModal));
+document.querySelectorAll('[data-auth-role]').forEach(roleButton => roleButton.addEventListener('click', () => {
+  const role = roleButton.dataset.authRole;
+  closeAuthModal();
+  if (role === 'admin') {
+    enterWorkspace('dashboard', 'admin');
+    openEventWizard();
+    return;
+  }
+  enterWorkspace('scanner', 'staff');
+  notify('Sesión iniciada como usuario de puerta');
+}));
 document.querySelectorAll('[data-role]').forEach(roleButton => roleButton.addEventListener('click', () => {
   const role = roleButton.dataset.role;
-  if (role === 'organizer') openEventWizard();
-  if (role === 'staff') enterWorkspace('scanner');
+  if (role === 'organizer') openAuthModal();
+  if (role === 'staff') {
+    closeAuthModal();
+    enterWorkspace('scanner', 'staff');
+  }
   if (role === 'guest') enterWorkspace('ticket');
 }));
 
@@ -107,7 +148,10 @@ eventForm.addEventListener('submit', event => {
   document.querySelector('.event-switcher strong').textContent = eventName;
   document.querySelector('.event-switcher .muted').textContent = venue;
   document.querySelector('#dashboard .page-heading h1').textContent = `Buenas tardes, ${eventName}`;
+  document.querySelector('.profile strong').textContent = 'Administrador';
   closeEventWizard();
   enterWorkspace('dashboard');
   notify(`Evento “${eventName}” creado correctamente`);
 });
+
+window.setTimeout(() => splashScreen.classList.add('is-hidden'), 1150);

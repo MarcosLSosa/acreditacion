@@ -334,6 +334,8 @@ La aplicación debe diferenciar “válido offline con sincronización pendiente
 ├── index.html       # Landing, wizard y vistas del prototipo
 ├── styles.css       # Sistema visual de la app operativa
 ├── landing.css      # Sistema visual de la portada y onboarding
+├── auth.css         # Splash inicial y acceso por roles
+├── role-overrides.css # Permisos visuales del menú por rol
 ├── app.js           # Navegación, simulaciones y creación de evento demo
 └── README.md        # Documentación de producto y arquitectura
 ```
