@@ -19,6 +19,78 @@ document.getElementById('shareEvent').addEventListener('click', () => notify('En
 document.getElementById('downloadTicket').addEventListener('click', () => notify('Acreditación guardada en el dispositivo'));
 document.getElementById('addGuest').addEventListener('click', () => notify('Formulario de invitado listo para conectar'));
 
+const budgetBot = document.getElementById('budgetBot');
+const budgetOptions = document.getElementById('budgetOptions');
+const budgetMessages = document.getElementById('budgetMessages');
+const budgetResult = document.getElementById('budgetResult');
+const budgetState = {};
+const budgetSteps = [
+  { key: 'guests', question: '¿Cuántas personas esperás?', options: [['100', 'Hasta 150 personas'], ['300', 'Entre 150 y 500'], ['800', 'Entre 500 y 1.000'], ['1500', 'Más de 1.000']] },
+  { key: 'duration', question: '¿Cuánto dura el evento?', options: [['short', 'Hasta 4 horas'], ['full', 'Jornada completa'], ['multi', 'Más de un día']] },
+  { key: 'extras', question: '¿Qué querés incluir?', options: [['scan', 'Validación en puerta'], ['tickets', 'Tickets digitales'], ['all', 'Todo el ecosistema']] }
+];
+
+function openBudgetBot() {
+  budgetBot.classList.add('open');
+  budgetBot.setAttribute('aria-hidden', 'false');
+}
+
+function closeBudgetBot() {
+  budgetBot.classList.remove('open');
+  budgetBot.setAttribute('aria-hidden', 'true');
+}
+
+function addBudgetMessage(text, type = 'bot-message') {
+  const message = document.createElement('div');
+  message.className = `budget-message ${type}`;
+  message.textContent = text;
+  budgetMessages.appendChild(message);
+  budgetMessages.scrollTop = budgetMessages.scrollHeight;
+}
+
+function askBudgetStep(stepIndex) {
+  const step = budgetSteps[stepIndex];
+  addBudgetMessage(step.question);
+  budgetOptions.innerHTML = step.options.map(([value, label]) => `<button data-budget-value="${value}">${label}</button>`).join('');
+  budgetOptions.hidden = false;
+}
+
+function formatBudget(value) {
+  return value.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+}
+
+function showBudgetResult() {
+  const base = { social: 260, corporate: 340, festival: 430 }[budgetState.type];
+  const guests = Number(budgetState.guests);
+  const duration = { short: 1, full: 1.35, multi: 1.9 }[budgetState.duration];
+  const extras = { scan: 1, tickets: 1.12, all: 1.28 }[budgetState.extras];
+  const total = Math.round((guests * base * duration * extras + 180000) / 10000) * 10000;
+  addBudgetMessage(`Para ${guests.toLocaleString('es-AR')} personas, tu operación estimada queda en ${formatBudget(total)}.`);
+  budgetResult.hidden = false;
+  budgetResult.innerHTML = `<span class="eyebrow accent">ESTIMACIÓN INICIAL</span><strong>${formatBudget(total)}</strong><small>Incluye configuración, tickets y operación base. Ajustamos el número final según puertas y alcance.</small><a href="mailto:hola@acredita.local?subject=Quiero%20mi%20presupuesto">Quiero mi presupuesto →</a>`;
+  budgetOptions.hidden = true;
+}
+
+document.getElementById('openBudgetBot').addEventListener('click', openBudgetBot);
+document.getElementById('closeBudgetBot').addEventListener('click', closeBudgetBot);
+budgetOptions.addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (!button) return;
+  const value = button.dataset.budgetValue;
+  if (!budgetState.type) {
+    budgetState.type = value;
+    addBudgetMessage(button.textContent, 'user-message');
+    askBudgetStep(0);
+    return;
+  }
+  const stepIndex = budgetSteps.findIndex(step => !budgetState[step.key]);
+  const step = budgetSteps[stepIndex];
+  budgetState[step.key] = value;
+  addBudgetMessage(button.textContent, 'user-message');
+  if (stepIndex < budgetSteps.length - 1) askBudgetStep(stepIndex + 1);
+  else showBudgetResult();
+});
+
 const result = document.getElementById('scanResult');
 const scanStates = {
   valid: { className: 'valid', icon: '✓', label: 'ACCESO VÁLIDO', title: 'Martina López', text: 'Entrada General · Zona principal · Token verificado' },
