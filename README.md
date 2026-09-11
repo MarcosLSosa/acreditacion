@@ -46,12 +46,12 @@ El backend actual es un MVP local: persiste en un archivo JSON y contiene usuari
 Desde la raíz del proyecto:
 
 ```bash
-node server.js
+node local-server.js
 ```
 
 Abrir [http://localhost:4173](http://localhost:4173).
 
-No hay `npm install` ni build requerido en esta etapa. Para servir solamente el prototipo visual se puede usar `python3 -m http.server 4173`, pero el login y la creación persistente de eventos requieren `node server.js`.
+No hay `npm install` ni build requerido en esta etapa. Para servir solamente el prototipo visual se puede usar `python3 -m http.server 4173`, pero el login y la creación persistente de eventos requieren `node local-server.js`.
 
 ### Usuarios locales de demostración
 
@@ -63,7 +63,7 @@ No hay `npm install` ni build requerido en esta etapa. Para servir solamente el 
 Las credenciales semilla se pueden cambiar antes de iniciar el servidor:
 
 ```bash
-ADMIN_EMAIL=admin@miempresa.com ADMIN_PASSWORD='cambiar-ahora' node server.js
+ADMIN_EMAIL=admin@miempresa.com ADMIN_PASSWORD='cambiar-ahora' node local-server.js
 ```
 
 En producción deben sustituirse por un proveedor de identidad, secretos fuera del código, base de datos y recuperación segura de cuenta.
@@ -365,7 +365,7 @@ La aplicación debe diferenciar “válido offline con sincronización pendiente
 ├── auth-overrides.css # Formulario de login
 ├── camera.css        # Estados visuales del visor de cámara
 ├── app.js           # Navegación, simulaciones y creación de evento demo
-├── server.js         # API local, sesiones y autorización por rol
+├── local-server.js   # API local, sesiones y autorización por rol
 ├── .gitignore       # Excluye datos locales y secretos
 └── README.md        # Documentación de producto y arquitectura
 ```
