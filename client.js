@@ -17,7 +17,74 @@ function notify(message) {
 
 document.getElementById('shareEvent').addEventListener('click', () => notify('Enlace de acceso copiado'));
 document.getElementById('downloadTicket').addEventListener('click', () => notify('Acreditación guardada en el dispositivo'));
-document.getElementById('addGuest').addEventListener('click', () => notify('Formulario de invitado listo para conectar'));
+const guestModal = document.getElementById('guestModal');
+const guestForm = document.getElementById('guestForm');
+const guestQrPanel = document.getElementById('guestQrPanel');
+const guests = [
+  { name: 'Joaquín Sosa', id: 'AR-8F4K-2201', category: 'General', status: 'Ingresó', gate: 'Puerta 01 · 21:42', initials: 'JS', color: 'coral' },
+  { name: 'Marina Castro', id: 'AR-8F4K-2202', category: 'VIP', status: 'Ingresó', gate: 'Puerta 02 · 21:41', initials: 'MC', color: 'blue-bg' },
+  { name: 'Agustín Ferrero', id: 'AR-8F4K-2203', category: 'Prensa', status: 'Pendiente', gate: '—', initials: 'AF', color: 'lilac-bg' }
+];
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+}
+
+function renderGuests() {
+  const table = document.querySelector('.guest-table');
+  if (!table) return;
+  table.innerHTML = '<div class="table-head"><span>ASISTENTE</span><span>TIPO DE ACCESO</span><span>ESTADO</span><span>ÚLTIMO INGRESO</span><span></span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><span class="activity-avatar ${guest.color}">${escapeHtml(guest.initials)}</span><strong>${escapeHtml(guest.name)}<small>ID ${escapeHtml(guest.id)}</small></strong></span><span>${escapeHtml(guest.category)}</span><span class="${guest.status === 'Ingresó' ? 'valid-tag' : 'pending-tag'}">${escapeHtml(guest.status)}</span><span>${escapeHtml(guest.gate)}</span><button class="more-button" aria-label="Opciones de ${escapeHtml(guest.name)}">•••</button></div>`).join('');
+}
+
+function openGuestModal() {
+  guestModal.classList.add('open');
+  guestModal.setAttribute('aria-hidden', 'false');
+  guestForm.reset();
+  guestQrPanel.hidden = true;
+}
+
+function closeGuestModal() {
+  guestModal.classList.remove('open');
+  guestModal.setAttribute('aria-hidden', 'true');
+}
+
+function buildGuestQr(seed) {
+  const qr = document.getElementById('guestQr');
+  qr.innerHTML = Array.from({ length: 169 }, (_, index) => {
+    const row = Math.floor(index / 13);
+    const col = index % 13;
+    const finder = (row < 5 && col < 5) || (row < 5 && col > 7) || (row > 7 && col < 5);
+    const finderRow = row % 8;
+    const finderCol = col % 8;
+    const finderOn = finder && (finderRow === 0 || finderRow === 4 || finderCol === 0 || finderCol === 4 || (finderRow > 1 && finderRow < 3 && finderCol > 1 && finderCol < 3));
+    const patternOn = ((index * 17 + seed.charCodeAt(index % seed.length) * 3 + row * col) % 7) < 3;
+    return `<span class="qr-cell ${finderOn || (!finder && patternOn) ? '' : 'off'}"></span>`;
+  }).join('');
+}
+
+document.getElementById('addGuest').addEventListener('click', openGuestModal);
+document.querySelectorAll('[data-close-guest]').forEach(control => control.addEventListener('click', closeGuestModal));
+guestForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const data = new FormData(guestForm);
+  const name = String(data.get('name')).trim();
+  const id = `AR-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${2204 + guests.length}`;
+  const initials = name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+  guests.unshift({ name, id, category: data.get('category'), status: 'Pendiente', gate: data.get('gate'), initials, color: 'green-bg' });
+  renderGuests();
+  document.getElementById('guestQrName').textContent = name;
+  document.getElementById('guestQrId').textContent = `ID · ${id}`;
+  buildGuestQr(`${id}${data.get('email')}`);
+  guestQrPanel.hidden = false;
+  notify('Invitado creado con QR listo para compartir');
+});
+document.getElementById('copyGuestLink').addEventListener('click', async () => {
+  const id = document.getElementById('guestQrId').textContent.replace('ID · ', '');
+  const link = `https://acredita-t1mi.vercel.app/ticket/${id}`;
+  try { await navigator.clipboard.writeText(link); } catch { /* El navegador puede bloquear el portapapeles local. */ }
+  notify('Enlace del invitado copiado');
+});
+renderGuests();
 
 const budgetBot = document.getElementById('budgetBot');
 const budgetOptions = document.getElementById('budgetOptions');
