@@ -76,10 +76,14 @@ body {
 .logo-strip { color: #8fa59d; }
 .logo-strip b { color: #dcebe4; }
 .feature-grid article { background: #111c1f; border-color: #263b37; }
-.feature-grid article { animation: content-enter .7s cubic-bezier(.2,.8,.2,1) both; }
-.feature-grid article:nth-child(2) { animation-delay: .12s; }
-.feature-grid article:nth-child(3) { animation-delay: .24s; }
+.feature-grid { position: relative; }
+.feature-grid::before { content: ''; position: absolute; top: -12px; left: 0; width: 64px; height: 2px; background: var(--green); box-shadow: 0 0 16px rgba(69, 224, 162, .75); animation: speed-scan 3.2s cubic-bezier(.65,0,.35,1) infinite; }
+.feature-grid article { animation: content-enter .7s cubic-bezier(.2,.8,.2,1) both, feature-speed 4.8s 1s ease-in-out infinite; }
+.feature-grid article:nth-child(2) { animation-delay: .12s, 1.35s; }
+.feature-grid article:nth-child(3) { animation-delay: .24s, 1.7s; }
 .feature-grid article:hover { border-color: var(--green); background: #152522; }
+.feature-grid article:hover .feature-arrow { transform: translate(5px, -5px); }
+.feature-arrow { display: inline-block; transition: transform .25s ease; }
 .feature-number { color: var(--green); }
 .feature-grid h3, .roles-section h2 { color: #eef8f3; }
 .role-pills button { background: #111c1f; border-color: #263b37; color: #eef8f3; }
@@ -136,6 +140,18 @@ body {
 @keyframes view-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes feature-speed {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes speed-scan {
+  0% { left: 0; opacity: 0; }
+  12% { opacity: 1; }
+  72% { opacity: 1; }
+  100% { left: calc(100% - 64px); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
