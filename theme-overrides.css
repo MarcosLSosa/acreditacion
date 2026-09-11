@@ -76,17 +76,26 @@ body {
 .logo-strip { color: #8fa59d; }
 .logo-strip b { color: #dcebe4; }
 .feature-grid article { background: #111c1f; border-color: #263b37; }
-.feature-grid { position: relative; }
-.feature-grid::before { content: ''; position: absolute; top: -12px; left: 0; width: 64px; height: 2px; background: var(--green); box-shadow: 0 0 16px rgba(69, 224, 162, .75); animation: speed-scan 3.2s cubic-bezier(.65,0,.35,1) infinite; }
-.feature-grid article { animation: content-enter .7s cubic-bezier(.2,.8,.2,1) both, feature-speed 4.8s 1s ease-in-out infinite; }
+.feature-grid { position: relative; gap: 14px; border-top: 0; }
+.feature-grid::before { content: ''; position: absolute; top: 50%; left: 3%; right: 3%; height: 1px; background: linear-gradient(90deg, transparent, #315b4e 12%, #315b4e 88%, transparent); opacity: .8; animation: speed-scan 3.2s cubic-bezier(.65,0,.35,1) infinite; }
+.feature-grid::after { content: 'FLUJO OPERATIVO'; position: absolute; top: -31px; right: 0; color: #58766b; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; }
+.feature-grid article { min-height: 244px; margin: 0; padding: 28px 28px 24px; overflow: hidden; border: 1px solid #263b37; border-radius: 4px; background: linear-gradient(145deg, #152522, #0f1a1c 70%); box-shadow: 0 16px 34px rgba(0, 0, 0, .16); animation: content-enter .7s cubic-bezier(.2,.8,.2,1) both, feature-speed 4.8s 1s ease-in-out infinite; }
+.feature-grid article::before { content: ''; position: absolute; width: 120px; height: 120px; right: -48px; bottom: -54px; border: 1px solid rgba(69, 224, 162, .18); border-radius: 50%; box-shadow: 0 0 0 12px rgba(69, 224, 162, .03), 0 0 0 24px rgba(69, 224, 162, .025); }
+.feature-grid article::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, rgba(69, 224, 162, .08), transparent 30%); opacity: .7; }
 .feature-grid article:nth-child(2) { animation-delay: .12s, 1.35s; }
 .feature-grid article:nth-child(3) { animation-delay: .24s, 1.7s; }
-.feature-grid article:hover { border-color: var(--green); background: #152522; }
+.feature-grid article:nth-child(2) { background: linear-gradient(145deg, #17272a, #101a1c 70%); }
+.feature-grid article:nth-child(3) { background: linear-gradient(145deg, #1a2521, #101a1c 70%); }
+.feature-grid article:hover { border-color: var(--green); background: #19362c; transform: translateY(-12px) !important; }
 .feature-grid article { animation-name: feature-drift; animation-duration: 3.6s; animation-delay: 0s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-fill-mode: both; will-change: transform, box-shadow; }
 .feature-grid article:nth-child(2) { animation-delay: .42s; }
 .feature-grid article:nth-child(3) { animation-delay: .84s; }
 .feature-grid article:hover .feature-arrow { transform: translate(5px, -5px); }
 .feature-arrow { display: inline-block; transition: transform .25s ease; }
+.feature-number { position: relative; z-index: 1; display: block; color: var(--green); font: 700 11px 'Space Grotesk'; letter-spacing: 1px; }
+.feature-grid h3, .feature-grid p, .feature-arrow { position: relative; z-index: 1; }
+.feature-grid h3 { margin-top: 58px; font-size: 25px; }
+.feature-grid p { max-width: 230px; }
 .feature-number { color: var(--green); }
 .feature-grid h3, .roles-section h2 { color: #eef8f3; }
 .role-pills button { background: #111c1f; border-color: #263b37; color: #eef8f3; }
