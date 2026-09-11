@@ -13,7 +13,7 @@ Organizador            Staff                 Dashboard
 
 ## Estado actual
 
-Este repositorio contiene un prototipo navegable de alta fidelidad y un MVP visual ejecutable sin dependencias externas.
+Este repositorio contiene un prototipo navegable de alta fidelidad y un backend MVP ejecutable con Node.js sin dependencias externas.
 
 ### Incluido en la demo
 
@@ -26,16 +26,18 @@ Este repositorio contiene un prototipo navegable de alta fidelidad y un MVP visu
 - Gestión de listas con categorías General, VIP y Prensa.
 - Diseño responsive para desktop, tablet y móvil.
 - Simulación de actualización de aforo, sincronización y notificaciones de operación.
+- Sesiones con cookie HttpOnly, login por rol y autorización de endpoints.
+- Persistencia local de usuarios y eventos en `data/store.json`.
 
 ### Límites explícitos de la demo
 
-Los datos viven en el navegador y no existe todavía un backend persistente. El QR visual, la rotación de token, el escaneo de cámara, el modo offline, los sonidos, las billeteras y la autenticación están representados visualmente o simulados. No debe usarse esta versión para validar accesos reales.
+El backend actual es un MVP local: persiste en un archivo JSON y contiene usuarios semilla configurables por entorno. El QR visual, la rotación de token, el escaneo de cámara, el modo offline, los sonidos y las billeteras todavía están representados visualmente o simulados. No debe usarse esta versión para validar accesos reales.
 
 ## Inicio rápido
 
 ### Requisitos
 
-- Python 3, Node.js o cualquier servidor HTTP estático.
+- Node.js 18 o superior.
 - Navegador moderno con soporte para CSS Grid, ES Modules básicos y Web APIs.
 
 ### Servidor local
@@ -43,12 +45,35 @@ Los datos viven en el navegador y no existe todavía un backend persistente. El 
 Desde la raíz del proyecto:
 
 ```bash
-python3 -m http.server 4173
+node server.js
 ```
 
 Abrir [http://localhost:4173](http://localhost:4173).
 
-También se puede usar cualquier servidor estático equivalente. No hay `npm install` ni build requerido en esta etapa.
+No hay `npm install` ni build requerido en esta etapa. Para servir solamente el prototipo visual se puede usar `python3 -m http.server 4173`, pero el login y la creación persistente de eventos requieren `node server.js`.
+
+### Usuarios locales de demostración
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| Administrador | `admin@acredita.local` | `admin-demo-2026` |
+| Usuario de puerta | `puerta@acredita.local` | `puerta-demo-2026` |
+
+Las credenciales semilla se pueden cambiar antes de iniciar el servidor:
+
+```bash
+ADMIN_EMAIL=admin@miempresa.com ADMIN_PASSWORD='cambiar-ahora' node server.js
+```
+
+En producción deben sustituirse por un proveedor de identidad, secretos fuera del código, base de datos y recuperación segura de cuenta.
+
+### API local disponible
+
+- `POST /api/auth/login`: crea una sesión HttpOnly.
+- `GET /api/auth/me`: devuelve el usuario de la sesión actual.
+- `POST /api/auth/logout`: revoca la sesión actual.
+- `GET /api/events`: lista los eventos autorizados para el usuario.
+- `POST /api/events`: crea un evento; requiere rol `admin`.
 
 ## Recorrido de usuario
 
@@ -336,7 +361,10 @@ La aplicación debe diferenciar “válido offline con sincronización pendiente
 ├── landing.css      # Sistema visual de la portada y onboarding
 ├── auth.css         # Splash inicial y acceso por roles
 ├── role-overrides.css # Permisos visuales del menú por rol
+├── auth-overrides.css # Formulario de login
 ├── app.js           # Navegación, simulaciones y creación de evento demo
+├── server.js         # API local, sesiones y autorización por rol
+├── .gitignore       # Excluye datos locales y secretos
 └── README.md        # Documentación de producto y arquitectura
 ```
 

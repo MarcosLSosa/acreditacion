@@ -79,8 +79,32 @@ function closeEventWizard() {
 }
 
 function openAuthModal() {
+  ensureLoginForm();
   authModal.classList.add('open');
   authModal.setAttribute('aria-hidden', 'false');
+}
+
+function ensureLoginForm() {
+  if (document.getElementById('loginForm')) return;
+  const form = document.createElement('form');
+  form.className = 'login-form';
+  form.id = 'loginForm';
+  form.innerHTML = '<label>Correo<input type="email" id="loginEmail" required placeholder="admin@acredita.local"></label><label>Contraseña<input type="password" id="loginPassword" required placeholder="••••••••"></label><button type="submit" class="form-submit">Ingresar <span>→</span></button><p class="login-error" id="loginError" role="alert"></p>';
+  document.querySelector('.auth-card').appendChild(form);
+  form.addEventListener('submit', loginUser);
+}
+
+async function loginUser(event) {
+  event.preventDefault();
+  const error = document.getElementById('loginError');
+  error.textContent = '';
+  const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value }) });
+  if (!response.ok) { error.textContent = 'Correo o contraseña incorrectos.'; return; }
+  const { user } = await response.json();
+  closeAuthModal();
+  enterWorkspace(user.role === 'staff' ? 'scanner' : 'dashboard', user.role);
+  if (user.role === 'admin') openEventWizard();
+  notify(`Sesión iniciada como ${user.role === 'admin' ? 'administrador' : 'usuario de puerta'}`);
 }
 
 function closeAuthModal() {
@@ -114,14 +138,10 @@ document.querySelectorAll('[data-close-modal]').forEach(control => control.addEv
 document.querySelectorAll('[data-close-auth]').forEach(control => control.addEventListener('click', closeAuthModal));
 document.querySelectorAll('[data-auth-role]').forEach(roleButton => roleButton.addEventListener('click', () => {
   const role = roleButton.dataset.authRole;
-  closeAuthModal();
-  if (role === 'admin') {
-    enterWorkspace('dashboard', 'admin');
-    openEventWizard();
-    return;
-  }
-  enterWorkspace('scanner', 'staff');
-  notify('Sesión iniciada como usuario de puerta');
+  ensureLoginForm();
+  document.getElementById('loginEmail').value = role === 'admin' ? 'admin@acredita.local' : 'puerta@acredita.local';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginPassword').focus();
 }));
 document.querySelectorAll('[data-role]').forEach(roleButton => roleButton.addEventListener('click', () => {
   const role = roleButton.dataset.role;
@@ -140,11 +160,13 @@ document.getElementById('addTicketType').addEventListener('click', () => {
   document.getElementById('ticketTypeList').appendChild(row);
 });
 
-eventForm.addEventListener('submit', event => {
+eventForm.addEventListener('submit', async event => {
   event.preventDefault();
   const data = new FormData(eventForm);
   const eventName = data.get('eventName') || 'Nuevo evento';
   const venue = data.get('eventVenue') || 'Ubicación pendiente';
+  const response = await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: eventName, venue, city: data.get('city'), startsAt: `${data.get('eventDate')}T${data.get('eventTime')}:00-03:00`, capacity: data.get('capacity'), ticketTypes: [...document.querySelectorAll('#ticketTypeList .ticket-type-row')].map(row => ({ name: row.children[0].value, capacity: Number(row.children[1].value) })) }) });
+  if (!response.ok) { notify('No se pudo crear el evento'); return; }
   document.querySelector('.event-switcher strong').textContent = eventName;
   document.querySelector('.event-switcher .muted').textContent = venue;
   document.querySelector('#dashboard .page-heading h1').textContent = `Buenas tardes, ${eventName}`;
