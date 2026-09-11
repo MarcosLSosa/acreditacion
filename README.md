@@ -364,7 +364,7 @@ La aplicación debe diferenciar “válido offline con sincronización pendiente
 ├── role-overrides.css # Permisos visuales del menú por rol
 ├── auth-overrides.css # Formulario de login
 ├── camera.css        # Estados visuales del visor de cámara
-├── app.js           # Navegación, simulaciones y creación de evento demo
+├── client.js        # Navegación, simulaciones y creación de evento demo
 ├── local-server.js   # API local, sesiones y autorización por rol
 ├── .gitignore       # Excluye datos locales y secretos
 └── README.md        # Documentación de producto y arquitectura
